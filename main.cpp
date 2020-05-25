@@ -19,8 +19,8 @@ std::vector<Customer *> clients;         // Clients vector
 std::vector<std::thread *> thClients;    // Clients threads vector
 
 point max_size;  // Window size
-Room *shopEntrance = new Room(0, 0, 21, 7, "Shop entrance");
-Room *alleys = new Room(0, 0, 35, 7, "Alleys");
+Room *shopEntrance = new Room(0, 0, 65, 7, "Shop entrance");
+Room *alleys = new Room(0, 0, 65, 7, "Alleys");
 Room *cashRegister = new Room(0, 0, 20, 7, "Cash Register");
 Room *corridor;
 bool end = false;     // Exit program flag
@@ -32,9 +32,9 @@ void exiting();        // Checking if ESCAPE button pressed
 void newClient();      // Adding new customer
 void exitedClients();  // Removing exiting customers
 void moveBasketsToEntrance(Room *alleys,
-                           Room *shopEntrance);  // Move baskets to shop entrance
-void getNewBasket(Room *shopEntrance);           // Getting basket method
-void shopping(Room *alleys);                     // Shopping method
+                           Room *shopEntrance);  // Cleaning and moving baskets to shop entrance
+void getNewBasket(Room *shopEntrance);           // Getting free baskets
+void shopping(Room *alleys);                     // Shopping
 
 void init() {
     initscr();
@@ -43,8 +43,8 @@ void init() {
 
     getmaxyx(stdscr, max_size.y, max_size.x);
 
-    shopEntrance->x = max_size.x / 2;
-    alleys->x = max_size.x / 2;
+    shopEntrance->x = max_size.x - 35;
+    alleys->x = max_size.x - 35;
     alleys->y = max_size.y - alleys->verticalSize;
     cashRegister->y = max_size.y - cashRegister->verticalSize;
     shopEntrance->setBaskets(BASKETS);
@@ -86,15 +86,20 @@ void print() {
 
         WINDOW *cor = newwin(corridor->verticalSize, corridor->horizontalSize,
                              corridor->y, corridor->x);
+
         touchwin(cor);
-        mvwprintw(cor, 2, 1, "Number of all clients: %d", clients.size());
+
+        mvwprintw(cor, 1, 3, "Biedronka - 'CORONA EDITION'");
+
         for (auto &client : clients) {
             mvwaddch(cor, client->pos.y, client->pos.x, CUSTOMER);
         }
+
         wrefresh(cor);
         exitedClients();
         usleep(100000);
     }
+
     while (closing) {
         clear();
         mvprintw(max_size.y / 2, max_size.x / 2 - 7, "Closing .  ");
